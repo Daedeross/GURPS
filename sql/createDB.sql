@@ -21,7 +21,6 @@ RETURNS int
 AS
 BEGIN
     DECLARE @thresh int;
-    IFF
     SET @thresh = CEILING((@maxVal - @curVal)/@maxVal;
     CASE 
 END;
