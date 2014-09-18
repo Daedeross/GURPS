@@ -1,5 +1,4 @@
-CREATE TABLE Characters
-{
+CREATE TABLE Characters {
     CharacterId int IDENTITY(1,1) PRIMARY KEY,
     UserId UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Users(Id),
     Name nvarchar(255),
@@ -21,23 +20,7 @@ CREATE TABLE Characters
 	InitiativeBonus int
 };
 
-CREATE TABLE EncounterCharacters
-{
-    Id int IDENTITY(1,1) PRIMARY KEY,
-    EncounterId int NOT NULL FOREIGN KEY REFERENCES Encounters(EncounterId),
-    CharacterId int NOT NULL FOREIGN KEY REFERENCES Characters(CharacterId),
-	HpMax int,
-	FpMax int,
-    HpDamage int DEFAULT 0,
-    FpDamage int DEFAULT 0,
-	HpCurrent AS HpMax - HpDamage,
-	FpCurrent AS FpMax - FpDamage,
-	InitiativeBonus int,
-    IsVisible bit DEFAULT TRUE,
-    IsKO bit DEFAULT FALSE,
-};
-
-CREATE FUNCTION getThreshold(@ecId int, @maxVal int, @curVal int)
+CREATE FUNCTION getThreshold(@maxVal int, @curVal int)
 RETURNS int
 AS
 BEGIN
@@ -51,6 +34,47 @@ BEGIN
 	END;
 	RETURN @ret;
 END;
+
+CREATE TABLE GmCharacters {
+	GmId UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Users(Id),
+	CharacterId int FOREIGN KEY REFERENCES Characters(CharacterId),
+}
+
+CREATE TABLE EncounterCharacters {
+    Id int IDENTITY(1,1) PRIMARY KEY,
+    EncounterId int NOT NULL FOREIGN KEY REFERENCES Encounters(EncounterId),
+    CharacterId int NOT NULL FOREIGN KEY REFERENCES Characters(CharacterId),
+	HpMax int,
+	FpMax int,
+    HpDamage int DEFAULT 0,
+    FpDamage int DEFAULT 0,
+	HpCurrent AS HpMax - HpDamage,
+	FpCurrent AS FpMax - FpDamage,
+	HpThreshold AS getThreshold(HpMax, HpCurrent),
+	FpThreshold AS getThreshold(FpMax, FpCurrent),
+	InitiativeBonus int, 
+    IsVisible bit DEFAULT TRUE,
+    IsKO bit DEFAULT FALSE,
+};
+
+CREATE TABLE Encounters {
+	EncounterId int IDENTITY(1,1) PRIMARy KEY,
+	Gm UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Users(Id),
+}
+
+CREATE TABLE EcounterPlayers {
+    EncounterId int NOT NULL FOREIGN KEY REFERENCES Encounters(EncounterId),
+	PlayerId UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Users(Id),
+}
+
+CREATE TABLE EncounterGms {
+    EncounterId int NOT NULL FOREIGN KEY REFERENCES Encounters(EncounterId),
+	Gm UNIQUEIDENTIFIER FOREIGN KEY REFERENCES Users(Id),
+}
+
+CREATE TABLE EncounterRounds {
+	
+}
 
 CREATE VIEW EncounterGMCharacters
 {
