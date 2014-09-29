@@ -57,5 +57,37 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="Tables" />
+    <Folder Include="Stored Procedures" />
+    <Folder Include="User Defined Types" />
+    <Folder Include="UserDefindedFunctions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\Characters.sql" />
+    <Build Include="Tables\DatabaseLog.sql" />
+    <Build Include="Tables\ErrorLog.sql" />
+    <Build Include="Tables\Users.sql" />
+    <Build Include="Tables\UserClaims.sql" />
+    <Build Include="Tables\UserLogins.sql" />
+    <Build Include="Tables\UserRoles.sql" />
+    <Build Include="Tables\UserUserRoles.sql" />
+    <Build Include="Stored Procedures\uspLogError.sql" />
+    <Build Include="Stored Procedures\uspPrintError.sql" />
+    <Build Include="User Defined Types\Email.sql" />
+    <Build Include="User Defined Types\Flag.sql" />
+    <Build Include="User Defined Types\Name.sql" />
+    <Build Include="User Defined Types\Phone.sql" />
+    <Build Include="Tables\GMCharacters.sql" />
+    <Build Include="Tables\EncounterCharacters.sql" />
+    <Build Include="Tables\Encounters.sql" />
+    <Build Include="Tables\EncounterPlayers.sql" />
+    <Build Include="Stored Procedures\uspCreateEncounterCharacter.sql" />
+    <Build Include="UserDefindedFunctions\udfGetThreshold.sql" />
+    <Build Include="Tables\EncounterGMs.sql" />
+    <Build Include="Tables\EncounterRounds.sql" />
+    <Build Include="Tables\InitiativeTokens.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="GurpsWebTools.refactorlog" />
   </ItemGroup>
 </Project>
