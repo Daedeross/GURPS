@@ -24,7 +24,7 @@ namespace GurpsBuilder.DataModels
             return Serialize(o);
         }
 
-        public object Deserialize(MemoryStream stream)
+        public static object Deserialize(MemoryStream stream)
         {
             IFormatter formatter = new BinaryFormatter();
             stream.Seek(0, SeekOrigin.Begin);
@@ -32,7 +32,7 @@ namespace GurpsBuilder.DataModels
             return o;
         }
 
-        public T Deserialize<T>(MemoryStream stream)
+        public static T Deserialize<T>(MemoryStream stream)
         {
             return (T)Deserialize(stream);
         }

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace GurpsBuilder.DataModels
 {
-    interface ITag: INotifyPropertyChanged
+    public interface ITag: INotifyPropertyChanged
     {
-        public string Text { get; set; }
-        public bool ReadOnly { get; set; }
+        string Text { get; set; }
+        bool ReadOnly { get; set; }
 
-        public ITrait Owner { get; }
+        ITrait Owner { get; }
     }
 }

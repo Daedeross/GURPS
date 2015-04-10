@@ -67,13 +67,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataModels\Traits\BaseTrait.cs" />
     <Compile Include="DataModels\Character.cs" />
+    <Compile Include="DataModels\Context.cs" />
+    <Compile Include="DataModels\DataModelBase.cs" />
     <Compile Include="DataModels\Interfaces\IGivesTag.cs" />
     <Compile Include="DataModels\MemorySerialize.cs" />
     <Compile Include="DataModels\Interfaces\ITag.cs" />
     <Compile Include="DataModels\Interfaces\ITrait.cs" />
     <Compile Include="DataModels\Interfaces\IValueTag.cs" />
-    <Compile Include="DataModels\StringTag.cs" />
     <Compile Include="DataModels\ValueTag.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

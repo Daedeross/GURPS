@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GurpsBuilder.DataModels
 {
-    interface IGivesTag: ITag
+    public interface IGivesTag: ITag
     {
         event EventHandler EventChanged;
     }

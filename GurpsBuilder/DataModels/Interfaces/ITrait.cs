@@ -6,10 +6,18 @@ using System.Threading.Tasks;
 
 namespace GurpsBuilder.DataModels
 {
-    interface ITrait
+    public interface ITrait
     {
-        public ITag this[string name] { get; set; }
+        Character Character { get; set; }
 
-        public List<ITrait> Mods { get; set; }
+        ITag this[string name] { get; set; }
+
+        List<ITrait> Mods { get; set; }
+
+        bool TryGetTag(string name, out ITag tag);
+
+        bool ContainsTag(string name);
+
+        T GetValueOfTag<T>(string name);
     }
 }

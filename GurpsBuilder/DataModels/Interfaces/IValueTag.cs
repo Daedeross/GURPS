@@ -6,17 +6,19 @@ using System.Threading.Tasks;
 
 namespace GurpsBuilder.DataModels
 {
-    interface IValueTag<T> : ITag
+    public interface IValueTag<T> : ITag
     {
-        public T Value { get; set; }
+        T Value { get; set; }
 
-        public T BaseValue { get; set; }
+        T DefaultValue { get; set; }
 
-        public T BonusValue { get; set; }
+        T BonusValue { get; set; }
 
-        public T FinalValue { get; }
+        T FinalValue { get; }
 
-        public Nullable<T> OverrideValue { get; set; }
+        T OverrideValue { get; set; }
+
+        Type GetValueType();
 
         event EventHandler ValueChanged;
     }

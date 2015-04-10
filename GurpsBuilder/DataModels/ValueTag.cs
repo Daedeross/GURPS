@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ExpressionEvaluator;
 
 namespace GurpsBuilder.DataModels
 {
-    class ValueTag<T>: IValueTag<T>
+    public class ValueTag<T>: DataModelBase, IValueTag<T>
     {
-        private T _baseValue;
-        private T _bonusValue;
+        protected T _baseValue;
+        protected T _bonusValue;
+        protected string _exprText;
+        protected CompiledExpression<T> _exprCompiled;
+        protected Func<Context, T> _exprDelegate;
 
         public T Value
         {
             get
             {
-                return _baseValue;
+                Context c = new Context() { character = Owner.Character, owner = this.Owner };
+                return _exprDelegate(c);
             }
             set
             {
@@ -23,7 +28,7 @@ namespace GurpsBuilder.DataModels
             }
         }
 
-        public T BaseValue
+        public T DefaultValue
         {
             get
             {
@@ -52,7 +57,7 @@ namespace GurpsBuilder.DataModels
             get { throw new NotImplementedException(); }
         }
 
-        public T? OverrideValue
+        public T OverrideValue
         {
             get
             {
@@ -70,7 +75,7 @@ namespace GurpsBuilder.DataModels
         {
             get
             {
-                throw new NotImplementedException();
+                return _exprText;
             }
             set
             {
@@ -90,6 +95,35 @@ namespace GurpsBuilder.DataModels
             }
         }
 
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        public Type GetValueType()
+        {
+            return typeof(T);
+        }
+
+
+        public ITrait Owner
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        #region Private Methods
+
+        private void CompileExpression(string expr)
+        {
+            try
+            {
+                _exprText = expr;
+                _exprCompiled = new CompiledExpression<T>(_exprText);
+                _exprDelegate = _exprCompiled.ScopeCompile<Context>();
+
+            }
+            catch
+            {
+                
+                throw;
+            }
+        }
+
+        #endregion // Private Methods
     }
 }
