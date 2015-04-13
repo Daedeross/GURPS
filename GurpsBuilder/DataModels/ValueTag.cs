@@ -9,52 +9,39 @@ namespace GurpsBuilder.DataModels
 {
     public class ValueTag<T>: DataModelBase, IValueTag<T>
     {
-        protected T _baseValue;
-        protected T _bonusValue;
+        #region Fields
+
+        protected T mDefaultValue;
+        protected T mBonusValue;
         protected string _exprText;
         protected CompiledExpression<T> _exprCompiled;
         protected Func<Context, T> _exprDelegate;
+        protected Context context;
+
+        #endregion // Fields
+
+        #region Properties
 
         public T Value
         {
-            get
-            {
-                Context c = new Context() { character = Owner.Character, owner = this.Owner };
-                return _exprDelegate(c);
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { return _exprDelegate(context); }
         }
 
         public T DefaultValue
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { return mDefaultValue; }
+            set { mDefaultValue = value; }
         }
 
         public T BonusValue
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { return mBonusValue;  }
+            set { mBonusValue = value; }
         }
 
         public T FinalValue
         {
-            get { throw new NotImplementedException(); }
+            get { return Value }
         }
 
         public T OverrideValue
@@ -100,11 +87,13 @@ namespace GurpsBuilder.DataModels
             return typeof(T);
         }
 
-
-        public ITrait Owner
+        protected ITaggable mOwner;
+        public ITaggable Owner
         {
-            get { throw new NotImplementedException(); }
+            get { return mOwner; }
         }
+
+        #endregion //Properties
 
         #region Private Methods
 
@@ -125,5 +114,32 @@ namespace GurpsBuilder.DataModels
         }
 
         #endregion // Private Methods
+
+        #region Constructors
+
+        #endregion // Constructors
+
+        #region Commands
+
+        #endregion // Commands
+
+        #region Private Methods
+
+        private void ResetContext(ITaggable owner)
+        {
+            context = Context.Generate(owner);
+        }
+
+        #endregion // Private Methods
+
+        #region Public Methods
+
+        public void Attatch(ITaggable owner)
+        {
+            mOwner = owner;
+            ResetContext(mOwner);
+        }
+
+        #endregion // Public Methods
     }
 }

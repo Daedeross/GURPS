@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,15 +9,48 @@ namespace GurpsBuilder.DataModels
 {
     public class Character : DataModelBase
     {
-        public Dictionary<string, ITrait> Attributes { get; set; }
+        #region Private Fields
 
-        public Dictionary<string, ITrait> Advantages { get; set; }
+        #endregion // Private fields
 
-        public Dictionary<string, ITrait> Disadvantages { get; set; }
+        #region Properties
 
-        public Dictionary<string, ITrait> Skills { get; set; }
+        public int Age { get; set; }
 
-        public Dictionary<string, ITrait> Items { get; set; }
+        public int Height { get; set; }
+
+        public dynamic Attributes { get; set; }
+
+        public dynamic Advantages { get; set; }
+
+        public dynamic Disadvantages { get; set; }
+
+        public dynamic Skills { get; set; }
+
+        public dynamic Items { get; set; }
+        
+        #endregion // Properties
+
+        #region Constructors
+
+        public Character()
+        {
+            Attributes = new ExpandoObject();
+            Advantages = new ExpandoObject();
+            Disadvantages = new ExpandoObject();
+            Skills = new ExpandoObject();
+            Items = new ExpandoObject();
+        }
+
+        #endregion // Constructors
+
+        #region Private Methods
+
+        #endregion // Private Methods
+
+        #region Public Methods
+
+        #endregion // Public Methods
 
     }
 }

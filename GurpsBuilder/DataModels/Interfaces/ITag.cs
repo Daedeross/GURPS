@@ -12,6 +12,6 @@ namespace GurpsBuilder.DataModels
         string Text { get; set; }
         bool ReadOnly { get; set; }
 
-        ITrait Owner { get; }
+        ITaggable Owner { get; }
     }
 }

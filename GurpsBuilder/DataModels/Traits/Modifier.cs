@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GurpsBuilder.DataModels
 {
-    public class BaseTrait: DataModelBase, IModdable, ITaggable
+    public class Modifier : DataModelBase, IModdable, ITaggable
     {
         #region Private Fields
 
@@ -14,21 +14,36 @@ namespace GurpsBuilder.DataModels
 
         #region Properties
 
-        public int Test1 { get; set; }
+        public Character Character
+        {
+            get { return mOwner.Character; }
+        }
 
-        public Character Character { get; private set; }
+        protected IModdable mOwner;
+        public IModdable Owner
+        {
+            get { return mOwner; }
+            set
+            {
+                if (value != mOwner)
+                {
+                    mOwner = value;
+                    OnPropertyChanged("Owner");
+                }
+            }
+        }
 
             #region ITaggable Implementation
 
-        protected Dictionary<string, ITag> mTags;
+        protected Dictionary<string, ITag> _tags;
         public Dictionary<string, ITag> Tags
         {
-            get { return mTags; }
+            get { return _tags; }
             set
             {
-                if (value != mTags)
+                if (value != _tags)
                 {
-                    mTags = value;
+                    _tags = value;
                     OnPropertyChanged("Tags");
                 }
             }
@@ -36,12 +51,12 @@ namespace GurpsBuilder.DataModels
 
         public bool ContainsTag(string name)
         {
-            return mTags.ContainsKey(name);
+            return _tags.ContainsKey(name);
         }
 
         public bool TryGetTag(string name, out ITag tag)
         {
-            return(mTags.TryGetValue(name, out tag));
+            return (_tags.TryGetValue(name, out tag));
         }
 
         public T GetTagValue<T>(string name)
@@ -49,7 +64,7 @@ namespace GurpsBuilder.DataModels
             T obj = default(T);
             ITag tag;
 
-            if (mTags.TryGetValue(name, out tag))
+            if (_tags.TryGetValue(name, out tag))
             {
                 IValueTag<T> vtag = tag as IValueTag<T>;
                 if (vtag != null)
@@ -66,7 +81,7 @@ namespace GurpsBuilder.DataModels
             value = default(T);
             ITag tag;
 
-            if (mTags.TryGetValue(name, out tag))
+            if (_tags.TryGetValue(name, out tag))
             {
                 IValueTag<T> vtag = tag as IValueTag<T>;
                 if (vtag != null)
@@ -112,23 +127,6 @@ namespace GurpsBuilder.DataModels
 
         #region Constructors
 
-        public BaseTrait()
-        {
-            Initialize();
-        }
-
-        public BaseTrait(Character character)
-        {
-            Character = character;
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            mMods = new Dictionary<string, Modifier>();
-            mTags = new Dictionary<string, ITag>();
-        }
-
         #endregion // Constructors
 
         #region Commands
@@ -141,9 +139,9 @@ namespace GurpsBuilder.DataModels
 
         #region Public Methods
 
-        public void Attatch(Character character)
+        public void Attatch(IModdable owner)
         {
-            this.Character = character;
+            mOwner = owner;
         }
 
         #endregion // Public Methods
