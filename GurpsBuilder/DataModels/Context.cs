@@ -6,15 +6,15 @@ namespace GurpsBuilder.DataModels
     {
         public Character character;
 
-        public dynamic Attributes { get { return character.Attributes; } }
+        public Dictionary<string, BaseTrait> Attributes { get { return character.Attributes; } }
 
-        public dynamic Advantages { get { return character.Advantages; } }
+        public Dictionary<string, BaseTrait> Advantages { get { return character.Advantages; } }
 
-        public dynamic Disadvantages { get { return character.Disadvantages; } }
+        public Dictionary<string, BaseTrait> Disadvantages { get { return character.Disadvantages; } }
 
-        public dynamic Skills { get { return character.Skills; } }
+        public Dictionary<string, BaseTrait> Skills { get { return character.Skills; } }
 
-        public dynamic Items { get { return character.Attributes; } }
+        public Dictionary<string, BaseTrait> Items { get { return character.Attributes; } }
 
         public ITaggable owner;
 

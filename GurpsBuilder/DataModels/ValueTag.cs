@@ -16,6 +16,7 @@ namespace GurpsBuilder.DataModels
         protected string _exprText;
         protected CompiledExpression<T> _exprCompiled;
         protected Func<Context, T> _exprDelegate;
+        protected Func<ValueTag<T>, T> _finalValueDelegate;
         protected Context context;
 
         #endregion // Fields
@@ -41,18 +42,33 @@ namespace GurpsBuilder.DataModels
 
         public T FinalValue
         {
-            get { return Value }
+            get { return _finalValueDelegate(this); }
         }
+
+        protected bool mIsOverride;
+        public bool IsOverride
+        {
+            get { return mIsOverride; }
+            set
+            {
+                if (mIsOverride != value)
+                {
+                    mIsOverride = value;
+                    OnPropertyChanged("IsOverride");
+                }
+            }
+        }
+
 
         public T OverrideValue
         {
             get
             {
-                throw new NotImplementedException();
+                return default(T);
             }
             set
             {
-                throw new NotImplementedException();
+                
             }
         }
 
@@ -66,7 +82,17 @@ namespace GurpsBuilder.DataModels
             }
             set
             {
-                throw new NotImplementedException();
+                _exprText = value;
+                try
+                {
+                    _exprCompiled = new CompiledExpression<T>(_exprText);
+                    _exprDelegate = _exprCompiled.ScopeCompile<Context>();
+                }
+                catch
+                {
+                    _exprCompiled = null;
+                    _exprDelegate = (c => this.mDefaultValue);
+                }
             }
         }
 
@@ -117,6 +143,27 @@ namespace GurpsBuilder.DataModels
 
         #region Constructors
 
+        public ValueTag()
+        {
+            Initialize();
+        }
+
+        public ValueTag(ITaggable owner)
+        {
+            ResetContext(owner);
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            //if (_finalValueDelegate == null)
+            //{
+                string expr = "IsOverride ? OverrideValue : Value + BonusValue";
+                CompiledExpression<T> ce = new CompiledExpression<T>(expr);
+                _finalValueDelegate = ce.ScopeCompile<ValueTag<T>>();
+            //}
+        }
+
         #endregion // Constructors
 
         #region Commands
@@ -141,5 +188,6 @@ namespace GurpsBuilder.DataModels
         }
 
         #endregion // Public Methods
+
     }
 }

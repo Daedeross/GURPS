@@ -18,6 +18,15 @@ namespace GurpsBuilder.DataModels
 
         public Character Character { get; private set; }
 
+        public ITag this[string index]
+        {
+            get
+            {
+                return Tags[index];
+            }
+            set { Tags[index] = value; }
+        }
+
             #region ITaggable Implementation
 
         protected Dictionary<string, ITag> mTags;

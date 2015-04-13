@@ -8,7 +8,7 @@ namespace GurpsBuilder.DataModels
 {
     public interface IValueTag<T> : ITag
     {
-        T Value { get; set; }
+        T Value { get; }
 
         T DefaultValue { get; set; }
 

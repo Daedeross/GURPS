@@ -19,15 +19,15 @@ namespace GurpsBuilder.DataModels
 
         public int Height { get; set; }
 
-        public dynamic Attributes { get; set; }
+        public Dictionary<string, BaseTrait> Attributes { get; set; }
 
-        public dynamic Advantages { get; set; }
+        public Dictionary<string, BaseTrait> Advantages { get; set; }
 
-        public dynamic Disadvantages { get; set; }
+        public Dictionary<string, BaseTrait> Disadvantages { get; set; }
 
-        public dynamic Skills { get; set; }
+        public Dictionary<string, BaseTrait> Skills { get; set; }
 
-        public dynamic Items { get; set; }
+        public Dictionary<string, BaseTrait> Items { get; set; }
         
         #endregion // Properties
 
@@ -35,11 +35,11 @@ namespace GurpsBuilder.DataModels
 
         public Character()
         {
-            Attributes = new ExpandoObject();
-            Advantages = new ExpandoObject();
-            Disadvantages = new ExpandoObject();
-            Skills = new ExpandoObject();
-            Items = new ExpandoObject();
+            Attributes = new Dictionary<string, BaseTrait>();
+            Advantages = new Dictionary<string, BaseTrait>();
+            Disadvantages = new Dictionary<string, BaseTrait>();
+            Skills = new Dictionary<string, BaseTrait>();
+            Items = new Dictionary<string, BaseTrait>();
         }
 
         #endregion // Constructors
