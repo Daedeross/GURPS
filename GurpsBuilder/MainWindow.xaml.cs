@@ -37,13 +37,14 @@ namespace GurpsBuilder
             c = new Character();
             c.Age = 10;
             c.Height = 3;
-            BaseTrait st = new BaseTrait();
+            dynamic st = new BaseTrait();
             st.Attatch(c);
             ValueTag<int> score = new ValueTag<int>(st);
 
             score.Name = "score";
             
-            st.Tags.Add("score", score);
+            //st.Tags.Add("score", score);
+            st.score = score;
             st.Test1 = 11;
             score.Text = "13";
             c.Attributes["ST"] = st;

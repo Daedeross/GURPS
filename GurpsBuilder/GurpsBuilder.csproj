@@ -68,6 +68,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataModels\DynamicDataModel.cs" />
     <Compile Include="DataModels\Interfaces\ITaggable.cs" />
     <Compile Include="DataModels\Traits\BaseTrait.cs" />
     <Compile Include="DataModels\Character.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="DataModels\Traits\Modifier.cs" />
     <Compile Include="DataModels\ValueTag.cs" />
     <Compile Include="lib\BlankClass.cs" />
+    <Compile Include="Loaders\TagLoader.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

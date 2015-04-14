@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Dynamic;
 
 namespace GurpsBuilder.DataModels
 {
-    public class BaseTrait: DataModelBase, IModdable, ITaggable
+    public class BaseTrait: DynamicDataModel, IModdable, ITaggable
     {
         #region Private Fields
 
@@ -18,14 +19,14 @@ namespace GurpsBuilder.DataModels
 
         public Character Character { get; private set; }
 
-        public ITag this[string index]
-        {
-            get
-            {
-                return Tags[index];
-            }
-            set { Tags[index] = value; }
-        }
+        //public ITag this[string index]
+        //{
+        //    get
+        //    {
+        //        return Tags[index];
+        //    }
+        //    set { Tags[index] = value; }
+        //}
 
             #region ITaggable Implementation
 
@@ -154,6 +155,32 @@ namespace GurpsBuilder.DataModels
         {
             this.Character = character;
         }
+
+            #region DynamicObject Overloads
+
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            string name = binder.Name.ToLower();
+            ITag obj;
+
+            bool ret = mTags.TryGetValue(name, out obj);
+            result = obj;
+            return ret;
+        }
+
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            string name = binder.Name.ToLower();
+            ITag tag = value as ITag;
+            if (tag != null)
+            {
+                mTags[name] = tag;
+                return true;
+            }
+            return false;
+        }
+
+            #endregion // DynamicObject Overloads
 
         #endregion // Public Methods
 

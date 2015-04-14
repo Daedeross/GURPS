@@ -16,7 +16,7 @@ namespace GurpsBuilder.DataModels
 
         public Dictionary<string, BaseTrait> Items { get { return character.Attributes; } }
 
-        public ITaggable owner;
+        public dynamic owner;
 
         public static Context Generate(ITaggable owner)
         {

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ExpressionEvaluator;
+using System.Dynamic;
+using System.Linq.Expressions;
 
 namespace GurpsBuilder.DataModels
 {
-    public class ValueTag<T>: DataModelBase, IValueTag<T>
+    public class ValueTag<T>: DynamicDataModel, IValueTag<T>
     {
         #region Fields
 
@@ -42,10 +44,11 @@ namespace GurpsBuilder.DataModels
 
         public T FinalValue
         {
-            get { return _finalValueDelegate(this); }
+            get { return Value; }
+            //get { return _finalValueDelegate(this); }
         }
 
-        protected bool mIsOverride;
+        protected bool mIsOverride = false;
         public bool IsOverride
         {
             get { return mIsOverride; }
@@ -58,7 +61,6 @@ namespace GurpsBuilder.DataModels
                 }
             }
         }
-
 
         public T OverrideValue
         {
@@ -82,30 +84,18 @@ namespace GurpsBuilder.DataModels
             }
             set
             {
-                _exprText = value;
-                try
+                if (value != _exprText)
                 {
-                    _exprCompiled = new CompiledExpression<T>(_exprText);
-                    _exprDelegate = _exprCompiled.ScopeCompile<Context>();
-                }
-                catch
-                {
-                    _exprCompiled = null;
-                    _exprDelegate = (c => this.mDefaultValue);
+                    CompileExpression(value);
+                    //System.Diagnostics.Debug.WriteLine("Compile!");
                 }
             }
         }
 
         public bool ReadOnly
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get;
+            set;
         }
 
         public Type GetValueType()
@@ -121,26 +111,6 @@ namespace GurpsBuilder.DataModels
 
         #endregion //Properties
 
-        #region Private Methods
-
-        private void CompileExpression(string expr)
-        {
-            try
-            {
-                _exprText = expr;
-                _exprCompiled = new CompiledExpression<T>(_exprText);
-                _exprDelegate = _exprCompiled.ScopeCompile<Context>();
-
-            }
-            catch
-            {
-                
-                throw;
-            }
-        }
-
-        #endregion // Private Methods
-
         #region Constructors
 
         public ValueTag()
@@ -150,15 +120,22 @@ namespace GurpsBuilder.DataModels
 
         public ValueTag(ITaggable owner)
         {
-            ResetContext(owner);
             Initialize();
+            Attatch(owner);
         }
 
         private void Initialize()
         {
+            //if (typeof(T) == typeof(string))
+            //{
+            //    mDefaultValue = (T)((object)"");
+            //    mBonusValue = (T)((object)"");
+            //}
+            mDefaultValue = default(T);
+            mBonusValue = default(T);
             //if (_finalValueDelegate == null)
             //{
-                string expr = "IsOverride ? OverrideValue : Value + BonusValue";
+                string expr = "IsOverride ? OverrideValue : (BonusValue == null ? Value : Value + BonusValue)";
                 CompiledExpression<T> ce = new CompiledExpression<T>(expr);
                 _finalValueDelegate = ce.ScopeCompile<ValueTag<T>>();
             //}
@@ -171,6 +148,22 @@ namespace GurpsBuilder.DataModels
         #endregion // Commands
 
         #region Private Methods
+
+        private void CompileExpression(string expr)
+        {
+            //try
+            //{
+                _exprText = expr;
+                _exprCompiled = new CompiledExpression<T>(_exprText);
+                _exprDelegate = _exprCompiled.ScopeCompile<Context>();
+
+            //}
+            //catch
+            //{
+            //    _exprCompiled = null;
+            //    _exprDelegate = (c => this.mDefaultValue);
+            //}
+        }
 
         private void ResetContext(ITaggable owner)
         {
@@ -186,6 +179,191 @@ namespace GurpsBuilder.DataModels
             mOwner = owner;
             ResetContext(mOwner);
         }
+
+            #region DynamicObject Overloads
+
+        public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object result)
+        {
+            switch (binder.Operation)
+            {
+                case ExpressionType.Add:
+                    
+                    break;
+                case ExpressionType.AddAssign:
+                    break;
+                case ExpressionType.AddAssignChecked:
+                    break;
+                case ExpressionType.AddChecked:
+                    break;
+                case ExpressionType.And:
+                    break;
+                case ExpressionType.AndAlso:
+                    break;
+                case ExpressionType.AndAssign:
+                    break;
+                case ExpressionType.ArrayIndex:
+                    break;
+                case ExpressionType.ArrayLength:
+                    break;
+                case ExpressionType.Assign:
+                    break;
+                case ExpressionType.Block:
+                    break;
+                case ExpressionType.Call:
+                    break;
+                case ExpressionType.Coalesce:
+                    break;
+                case ExpressionType.Conditional:
+                    break;
+                case ExpressionType.Constant:
+                    break;
+                case ExpressionType.Convert:
+                    break;
+                case ExpressionType.ConvertChecked:
+                    break;
+                case ExpressionType.DebugInfo:
+                    break;
+                case ExpressionType.Decrement:
+                    break;
+                case ExpressionType.Default:
+                    break;
+                case ExpressionType.Divide:
+                    break;
+                case ExpressionType.DivideAssign:
+                    break;
+                case ExpressionType.Dynamic:
+                    break;
+                case ExpressionType.Equal:
+                    break;
+                case ExpressionType.ExclusiveOr:
+                    break;
+                case ExpressionType.ExclusiveOrAssign:
+                    break;
+                case ExpressionType.Extension:
+                    break;
+                case ExpressionType.Goto:
+                    break;
+                case ExpressionType.GreaterThan:
+                    break;
+                case ExpressionType.GreaterThanOrEqual:
+                    break;
+                case ExpressionType.Increment:
+                    break;
+                case ExpressionType.Index:
+                    break;
+                case ExpressionType.Invoke:
+                    break;
+                case ExpressionType.IsFalse:
+                    break;
+                case ExpressionType.IsTrue:
+                    break;
+                case ExpressionType.Label:
+                    break;
+                case ExpressionType.Lambda:
+                    break;
+                case ExpressionType.LeftShift:
+                    break;
+                case ExpressionType.LeftShiftAssign:
+                    break;
+                case ExpressionType.LessThan:
+                    break;
+                case ExpressionType.LessThanOrEqual:
+                    break;
+                case ExpressionType.ListInit:
+                    break;
+                case ExpressionType.Loop:
+                    break;
+                case ExpressionType.MemberAccess:
+                    break;
+                case ExpressionType.MemberInit:
+                    break;
+                case ExpressionType.Modulo:
+                    break;
+                case ExpressionType.ModuloAssign:
+                    break;
+                case ExpressionType.Multiply:
+                    break;
+                case ExpressionType.MultiplyAssign:
+                    break;
+                case ExpressionType.MultiplyAssignChecked:
+                    break;
+                case ExpressionType.MultiplyChecked:
+                    break;
+                case ExpressionType.Negate:
+                    break;
+                case ExpressionType.NegateChecked:
+                    break;
+                case ExpressionType.New:
+                    break;
+                case ExpressionType.NewArrayBounds:
+                    break;
+                case ExpressionType.NewArrayInit:
+                    break;
+                case ExpressionType.Not:
+                    break;
+                case ExpressionType.NotEqual:
+                    break;
+                case ExpressionType.OnesComplement:
+                    break;
+                case ExpressionType.Or:
+                    break;
+                case ExpressionType.OrAssign:
+                    break;
+                case ExpressionType.OrElse:
+                    break;
+                case ExpressionType.Parameter:
+                    break;
+                case ExpressionType.PostDecrementAssign:
+                    break;
+                case ExpressionType.PostIncrementAssign:
+                    break;
+                case ExpressionType.Power:
+                    break;
+                case ExpressionType.PowerAssign:
+                    break;
+                case ExpressionType.PreDecrementAssign:
+                    break;
+                case ExpressionType.PreIncrementAssign:
+                    break;
+                case ExpressionType.Quote:
+                    break;
+                case ExpressionType.RightShift:
+                    break;
+                case ExpressionType.RightShiftAssign:
+                    break;
+                case ExpressionType.RuntimeVariables:
+                    break;
+                case ExpressionType.Subtract:
+                    break;
+                case ExpressionType.SubtractAssign:
+                    break;
+                case ExpressionType.SubtractAssignChecked:
+                    break;
+                case ExpressionType.SubtractChecked:
+                    break;
+                case ExpressionType.Switch:
+                    break;
+                case ExpressionType.Throw:
+                    break;
+                case ExpressionType.Try:
+                    break;
+                case ExpressionType.TypeAs:
+                    break;
+                case ExpressionType.TypeEqual:
+                    break;
+                case ExpressionType.TypeIs:
+                    break;
+                case ExpressionType.UnaryPlus:
+                    break;
+                case ExpressionType.Unbox:
+                    break;
+                default:
+                    break;
+            }
+            return base.TryBinaryOperation(binder, arg, out result);
+        }
+
+            #endregion // DynamicObject Overloads
 
         #endregion // Public Methods
 
