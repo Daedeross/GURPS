@@ -20,6 +20,7 @@ namespace GurpsBuilder.DataModels
         protected Func<Context, T> _exprDelegate;
         protected Func<ValueTag<T>, T> _finalValueDelegate;
         protected Context context;
+        protected Type mValueType = typeof(T);
 
         #endregion // Fields
 
@@ -170,6 +171,27 @@ namespace GurpsBuilder.DataModels
             context = Context.Generate(owner);
         }
 
+        private bool IsNumeric(Type t)
+        {
+            switch (Type.GetTypeCode(t))
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         #endregion // Private Methods
 
         #region Public Methods
@@ -184,183 +206,98 @@ namespace GurpsBuilder.DataModels
 
         public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object result)
         {
-            switch (binder.Operation)
+            // if we hold a string, then convert arg to string and do opp
+            if(mValueType == typeof(string))
             {
-                case ExpressionType.Add:
-                    
-                    break;
-                case ExpressionType.AddAssign:
-                    break;
-                case ExpressionType.AddAssignChecked:
-                    break;
-                case ExpressionType.AddChecked:
-                    break;
-                case ExpressionType.And:
-                    break;
-                case ExpressionType.AndAlso:
-                    break;
-                case ExpressionType.AndAssign:
-                    break;
-                case ExpressionType.ArrayIndex:
-                    break;
-                case ExpressionType.ArrayLength:
-                    break;
-                case ExpressionType.Assign:
-                    break;
-                case ExpressionType.Block:
-                    break;
-                case ExpressionType.Call:
-                    break;
-                case ExpressionType.Coalesce:
-                    break;
-                case ExpressionType.Conditional:
-                    break;
-                case ExpressionType.Constant:
-                    break;
-                case ExpressionType.Convert:
-                    break;
-                case ExpressionType.ConvertChecked:
-                    break;
-                case ExpressionType.DebugInfo:
-                    break;
-                case ExpressionType.Decrement:
-                    break;
-                case ExpressionType.Default:
-                    break;
-                case ExpressionType.Divide:
-                    break;
-                case ExpressionType.DivideAssign:
-                    break;
-                case ExpressionType.Dynamic:
-                    break;
-                case ExpressionType.Equal:
-                    break;
-                case ExpressionType.ExclusiveOr:
-                    break;
-                case ExpressionType.ExclusiveOrAssign:
-                    break;
-                case ExpressionType.Extension:
-                    break;
-                case ExpressionType.Goto:
-                    break;
-                case ExpressionType.GreaterThan:
-                    break;
-                case ExpressionType.GreaterThanOrEqual:
-                    break;
-                case ExpressionType.Increment:
-                    break;
-                case ExpressionType.Index:
-                    break;
-                case ExpressionType.Invoke:
-                    break;
-                case ExpressionType.IsFalse:
-                    break;
-                case ExpressionType.IsTrue:
-                    break;
-                case ExpressionType.Label:
-                    break;
-                case ExpressionType.Lambda:
-                    break;
-                case ExpressionType.LeftShift:
-                    break;
-                case ExpressionType.LeftShiftAssign:
-                    break;
-                case ExpressionType.LessThan:
-                    break;
-                case ExpressionType.LessThanOrEqual:
-                    break;
-                case ExpressionType.ListInit:
-                    break;
-                case ExpressionType.Loop:
-                    break;
-                case ExpressionType.MemberAccess:
-                    break;
-                case ExpressionType.MemberInit:
-                    break;
-                case ExpressionType.Modulo:
-                    break;
-                case ExpressionType.ModuloAssign:
-                    break;
-                case ExpressionType.Multiply:
-                    break;
-                case ExpressionType.MultiplyAssign:
-                    break;
-                case ExpressionType.MultiplyAssignChecked:
-                    break;
-                case ExpressionType.MultiplyChecked:
-                    break;
-                case ExpressionType.Negate:
-                    break;
-                case ExpressionType.NegateChecked:
-                    break;
-                case ExpressionType.New:
-                    break;
-                case ExpressionType.NewArrayBounds:
-                    break;
-                case ExpressionType.NewArrayInit:
-                    break;
-                case ExpressionType.Not:
-                    break;
-                case ExpressionType.NotEqual:
-                    break;
-                case ExpressionType.OnesComplement:
-                    break;
-                case ExpressionType.Or:
-                    break;
-                case ExpressionType.OrAssign:
-                    break;
-                case ExpressionType.OrElse:
-                    break;
-                case ExpressionType.Parameter:
-                    break;
-                case ExpressionType.PostDecrementAssign:
-                    break;
-                case ExpressionType.PostIncrementAssign:
-                    break;
-                case ExpressionType.Power:
-                    break;
-                case ExpressionType.PowerAssign:
-                    break;
-                case ExpressionType.PreDecrementAssign:
-                    break;
-                case ExpressionType.PreIncrementAssign:
-                    break;
-                case ExpressionType.Quote:
-                    break;
-                case ExpressionType.RightShift:
-                    break;
-                case ExpressionType.RightShiftAssign:
-                    break;
-                case ExpressionType.RuntimeVariables:
-                    break;
-                case ExpressionType.Subtract:
-                    break;
-                case ExpressionType.SubtractAssign:
-                    break;
-                case ExpressionType.SubtractAssignChecked:
-                    break;
-                case ExpressionType.SubtractChecked:
-                    break;
-                case ExpressionType.Switch:
-                    break;
-                case ExpressionType.Throw:
-                    break;
-                case ExpressionType.Try:
-                    break;
-                case ExpressionType.TypeAs:
-                    break;
-                case ExpressionType.TypeEqual:
-                    break;
-                case ExpressionType.TypeIs:
-                    break;
-                case ExpressionType.UnaryPlus:
-                    break;
-                case ExpressionType.Unbox:
-                    break;
-                default:
-                    break;
+                string argStr = arg.ToString();
+
+                switch (binder.Operation)
+                {
+                    case ExpressionType.Add:
+                        result = this.FinalValue + argStr;
+                        return true;
+                    case ExpressionType.AddAssign:
+                        result = this.FinalValue + argStr;
+                        return true;
+                    case ExpressionType.Equal:
+                        result = this.FinalValue.ToString() == argStr;
+                        return true;
+                    case ExpressionType.NotEqual:
+                        result = this.FinalValue.ToString() != argStr;
+                        return true;
+                    default:
+                        result = this.FinalValue;
+                        return false;
+                }
             }
+
+            // see what the arg type is;
+            //Type argType = arg.GetType();
+            //bool isString = ( mValueType == typeof(string) );
+            //if (argType.IsGenericType)
+            //{
+            //    Type genType = argType.GetGenericTypeDefinition();
+            //    if (genType == typeof(IValueTag<>))
+            //    {
+            //        Type valType = genType.GetGenericArguments()[0];
+            //    }
+            //}
             return base.TryBinaryOperation(binder, arg, out result);
+        }
+
+        public override bool TryConvert(ConvertBinder binder, out object result)
+        {
+            // the simplest case
+            if (binder.Type == typeof(T))
+            {
+                result = this.FinalValue;
+                return true;
+            }
+
+            // try converting to output type
+            try
+            {
+                if (binder.Type == typeof(Int16))
+                {
+                    result = Convert.ToInt16(this.FinalValue);
+                }
+                else if (binder.Type == typeof(Int32))
+                {
+                    result = Convert.ToInt32(this.FinalValue);
+                }
+                else if (binder.Type == typeof(Int64))
+                {
+                    result = Convert.ToInt64(this.FinalValue);
+                }
+                else if (binder.Type == typeof(Boolean))
+                {
+                    result = Convert.ToBoolean(this.FinalValue);
+                }
+                else if (binder.Type == typeof(Single))
+                {
+                    result = Convert.ToSingle(this.FinalValue);
+                }
+                else if (binder.Type == typeof(Double))
+                {
+                    result = Convert.ToDouble(this.FinalValue);
+                }
+                else if (binder.Type == typeof(Decimal))
+                {
+                    result = Convert.ToDecimal(this.FinalValue);
+                }
+                else
+                {
+                    result = null;
+                    return false;
+                }
+
+                return true;
+            }
+            catch (InvalidCastException)
+            {
+                result = null;
+                return true;
+            }
         }
 
             #endregion // DynamicObject Overloads
