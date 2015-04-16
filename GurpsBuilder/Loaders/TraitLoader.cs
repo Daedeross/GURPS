@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace GurpsBuilder.Loaders
 {
-    public class TagLoader<T>
+    public class TraitLoader
     {
         public string Name { get; set; }
 
-        public string Text { get; set; }
-
-        public T DefaultValue { get; set; }
     }
 }
