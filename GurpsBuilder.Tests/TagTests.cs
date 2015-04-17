@@ -40,11 +40,11 @@ namespace GurpsBuilder.Tests
         {
             Character c = new Character();
             dynamic bt = new BaseTrait(c);
-            ITag ti = new ValueTag<int>(bt);
+            dynamic ti = new ValueTag<int>(bt);
             ti.Text = "11";
             bt.TestInt1 = ti;
 
-            IValueTag<int> result = new ValueTag<int>(bt);
+            dynamic result = new ValueTag<int>(bt);
             result.Text = "owner.TestInt1 + 2";
             bt.ResultInt = result;
 
