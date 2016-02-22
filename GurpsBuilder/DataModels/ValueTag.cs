@@ -20,7 +20,7 @@ namespace GurpsBuilder.DataModels
         protected CompiledExpression<T> _exprCompiled;
         protected Func<Context, T> _exprDelegate;
         protected Func<ValueTag<T>, T> _finalValueDelegate;
-        protected Context context;
+        protected dynamic context;
         protected Type mValueType = typeof(T);
 
         #endregion // Fields
@@ -218,10 +218,57 @@ namespace GurpsBuilder.DataModels
 
             #region DynamicObject Overloads
 
+        public override bool TryUnaryOperation(UnaryOperationBinder binder, out object result)
+        {
+            if (IsNumeric(myValueType))
+            {
+                switch (binder.Operation)
+                {
+                    case ExpressionType.Decrement:
+                        result = (dynamic)this.FinalValue - 1;
+                        return true;
+                    case ExpressionType.Increment:
+                        result = (dynamic)this.FinalValue + 1;
+                        return true;
+                    case ExpressionType.Negate:
+                        result = -(dynamic)(this.FinalValue);
+                        return true;
+                    case ExpressionType.OnesComplement:
+                        if (myValueType == typeof(int) || myValueType == typeof(uint))
+                        {
+                            result = ~((int)(object)this.FinalValue);
+                            return true;
+                        }
+                        result = this;
+                        return false;
+                    default:
+                        result = this;
+                        return false;
+                }
+            }
+            else if (myValueType == typeof(string))
+            {
+                switch (binder.Operation)
+                {
+                    case ExpressionType.IsFalse:
+                        result = String.Compare(this.FinalValue.ToString(), "false", true) == 0;
+                        return true;
+                    case ExpressionType.IsTrue:
+                        result = String.Compare(this.FinalValue.ToString(), "true", true) == 0;
+                        return true;
+                    default:
+                        result = this;
+                        return false;
+                }
+
+            }
+            result = this;
+            return false;
+        }
+
         public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object result)
         {
-            // if we hold a string, then convert arg to string and do opp
-            
+            // if we hold a string, then convert arg to string and do opp            
             if(mValueType == typeof(string))
             {
                 string argStr = arg.ToString();
@@ -245,10 +292,107 @@ namespace GurpsBuilder.DataModels
                         return false;
                 }
             }
-            
+            try
+            {
+                if (IsNumeric(binder.ReturnType))
+                {
+                    switch (binder.Operation)
+                    {
+                        case ExpressionType.Add:
+                            result = (dynamic)this.FinalValue + arg;
+                            return true;
+                        case ExpressionType.AddAssign:
+                            result = (dynamic)this.FinalValue + arg;
+                            return true;
+                        case ExpressionType.Divide:
+                            result = (dynamic)this.FinalValue / arg;
+                            return true;
+                        case ExpressionType.DivideAssign:
+                            result = (dynamic)this.FinalValue / arg;
+                            return true;
+                        case ExpressionType.GreaterThan:
+                            result = (dynamic)this.FinalValue > arg;
+                            return true;
+                        case ExpressionType.GreaterThanOrEqual:
+                            result = (dynamic)this.FinalValue >= arg;
+                            return true;
+                        case ExpressionType.LeftShift:
+                            if (myValueType == typeof(int))
+                            {
+                                result = (dynamic)FinalValue << arg;
+                                return true;
+                            }
+                            break;
+                        case ExpressionType.LeftShiftAssign:
+                            if (myValueType == typeof(int))
+                            {
+                                result = (dynamic)FinalValue << arg;
+                                return true;
+                            }
+                            break;
+                        case ExpressionType.LessThan:
+                            result = (dynamic)this.FinalValue < arg;
+                            return true;
+                        case ExpressionType.LessThanOrEqual:
+                            result = (dynamic)this.FinalValue <= arg;
+                            break;
+                        case ExpressionType.Modulo:
+                            if (myValueType == typeof(int))
+                            {
+                                result = (dynamic)FinalValue % arg;
+                                return true;
+                            }
+                            break;
+                        case ExpressionType.ModuloAssign:
+                            if (myValueType == typeof(int))
+                            {
+                                result = (dynamic)FinalValue % arg;
+                                return true;
+                            }
+                            break;
+                        case ExpressionType.Multiply:
+                            result = (dynamic)this.FinalValue * arg;
+                            return true;
+                        case ExpressionType.MultiplyAssign:
+                            result = (dynamic)this.FinalValue * arg;
+                            return true;
+                        case ExpressionType.NotEqual:
+                            result = (dynamic)this.FinalValue != arg;
+                            return true;
+                        case ExpressionType.RightShift:
+                            if (myValueType == typeof(int))
+                            {
+                                result = (dynamic)FinalValue >> arg;
+                                return true;
+                            }
+                            break;
+                        case ExpressionType.RightShiftAssign:
+                            if (myValueType == typeof(int))
+                            {
+                                result = (dynamic)FinalValue >> arg;
+                                return true;
+                            }
+                            break;
+                        case ExpressionType.Subtract:
+                            result = (dynamic)FinalValue - arg;
+                            return true;
+                        case ExpressionType.SubtractAssign:
+                            result = (dynamic)FinalValue - arg;
+                            return true;
+                        default:
+                            break;
+                    }
+                }  
+
+            }
+            catch (InvalidCastException)
+            {
+                result = null;
+                return false;
+            }
             // see what the arg type is;
             //Type argType = arg.GetType();
-            //bool isString = ( mValueType == typeof(string) );
+            //bool isString = ( myValueType == typeof(string) );
             //if (argType.IsGenericType)
             //{
             //    Type genType = argType.GetGenericTypeDefinition();
