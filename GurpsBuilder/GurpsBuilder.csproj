@@ -69,6 +69,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DataModels\DynamicDataModel.cs" />
+    <Compile Include="DataModels\FloatTag.cs" />
     <Compile Include="DataModels\Interfaces\ITaggable.cs" />
     <Compile Include="DataModels\Traits\BaseTrait.cs" />
     <Compile Include="DataModels\Character.cs" />

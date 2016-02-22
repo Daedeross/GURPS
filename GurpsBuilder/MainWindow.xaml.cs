@@ -27,7 +27,7 @@ namespace GurpsBuilder
     /// </summary>
     public partial class MainWindow : Window
     {
-        Character c;
+        dynamic c;
 
         public ObservableCollection<string> propNames { get; set; }
 
@@ -39,7 +39,7 @@ namespace GurpsBuilder
             c.Height = 3;
             dynamic st = new BaseTrait();
             st.Attatch(c);
-            ValueTag<int> score = new ValueTag<int>(st);
+            ValueTag<double> score = new ValueTag<double>(st);
 
             score.Name = "score";
             
@@ -47,27 +47,36 @@ namespace GurpsBuilder
             st.score = score;
             st.Test1 = 11;
             score.Text = "13";
-            c.Attributes["ST"] = st;
+            dynamic attr = c.Attributes;
+            attr.ST = st;
             propNames = new ObservableCollection<string>(); 
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             string exprString = exprText.Text;
-            CompiledExpression<int> ce = new CompiledExpression<int>(exprString);
-
-            Func<Character, int> del = ce.ScopeCompile<Character>();
-
-            int result = 0;
+            CompiledExpression<double> ce = new CompiledExpression<double>(exprString);
+            Func<Character, double> del;
 
             try
             {
-                result = del(c);
+                del = ce.ScopeCompile<Character>();
             }
-            catch
+            catch (ExpressionEvaluator.Parser.ExpressionParseException)
             {
-                result = -1;
+                throw;
             }
+
+            double result;
+
+            //try
+            //{
+                result = del(c);
+            //}
+            //catch
+            //{
+            //    result = -1;
+            //}
             propNames = new ObservableCollection<string>(getPropNames(ce.Expression, null));
             propList.ItemsSource = propNames;
             exprResult.Text = result.ToString();

@@ -15,6 +15,7 @@ namespace GurpsBuilder.DataModels
 
         protected T mDefaultValue;
         protected T mBonusValue;
+        protected T mLastValidValue;
         protected string _exprText;
         protected CompiledExpression<T> _exprCompiled;
         protected Func<Context, T> _exprDelegate;
@@ -28,7 +29,20 @@ namespace GurpsBuilder.DataModels
 
         public T Value
         {
-            get { return _exprDelegate(context); }
+            get
+            {
+                T val;
+                try
+                {
+                    val = _exprDelegate(context);
+                    mLastValidValue = val;
+                }
+                catch
+                {
+                    val = mLastValidValue;
+                }
+                return val;
+            }
         }
 
         public T DefaultValue
@@ -207,6 +221,7 @@ namespace GurpsBuilder.DataModels
         public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object result)
         {
             // if we hold a string, then convert arg to string and do opp
+            
             if(mValueType == typeof(string))
             {
                 string argStr = arg.ToString();
@@ -230,7 +245,7 @@ namespace GurpsBuilder.DataModels
                         return false;
                 }
             }
-
+            
             // see what the arg type is;
             //Type argType = arg.GetType();
             //bool isString = ( mValueType == typeof(string) );
@@ -242,6 +257,30 @@ namespace GurpsBuilder.DataModels
             //        Type valType = genType.GetGenericArguments()[0];
             //    }
             //}
+            dynamic me = this;
+            if (IsNumeric(binder.ReturnType))
+            {
+                float t = me;
+                switch (binder.Operation)
+                {
+                    case ExpressionType.Add:
+                        result = t + (float) arg;
+                        return true;
+                    case ExpressionType.AddAssign:
+                        result = t + (float)arg;
+                        return true;
+                    case ExpressionType.Equal:
+                        result = t == (float)arg;
+                        return true;
+                    case ExpressionType.NotEqual:
+                        result = t != (float)arg;
+                        return true;
+                    default:
+                        result = this.FinalValue;
+                        return false;
+                }
+            }
+
             return base.TryBinaryOperation(binder, arg, out result);
         }
 
@@ -303,6 +342,108 @@ namespace GurpsBuilder.DataModels
             #endregion // DynamicObject Overloads
 
         #endregion // Public Methods
+
+        #region Implicit Conversion Methods
+
+        public static implicit operator bool(ValueTag<T> t)
+        {
+            bool result;
+            try
+            {
+                result = Convert.ToBoolean(t.FinalValue);
+            }
+            catch (InvalidCastException)
+            {
+                result = false;
+            }
+            return result;
+        }
+
+        public static implicit operator short(ValueTag<T> t)
+        {
+            short result;
+            try
+            {
+                result = Convert.ToInt16(t.FinalValue);
+            }
+            catch (InvalidCastException)
+            {
+                result = 0;
+            }
+            return result;
+        }
+
+        public static implicit operator int(ValueTag<T> t)
+        {
+            int result;
+            try
+            {
+                result = Convert.ToInt32(t.FinalValue);
+            }
+            catch (InvalidCastException)
+            {
+                result = 0;
+            }
+            return result;
+        }
+
+        public static implicit operator long(ValueTag<T> t)
+        {
+            long result;
+            try
+            {
+                result = Convert.ToInt64(t.FinalValue);
+            }
+            catch (InvalidCastException)
+            {
+                result = 0;
+            }
+            return result;
+        }
+
+        public static implicit operator float(ValueTag<T> t)
+        {
+            float result;
+            try
+            {
+                result = Convert.ToSingle(t.FinalValue);
+            }
+            catch (InvalidCastException)
+            {
+                result = 0;
+            }
+            return result;
+        }
+
+        public static implicit operator double(ValueTag<T> t)
+        {
+            double result;
+            try
+            {
+                result = Convert.ToDouble(t.FinalValue);
+            }
+            catch (InvalidCastException)
+            {
+                result = 0;
+            }
+            return result;
+        }
+
+        public static implicit operator decimal(ValueTag<T> t)
+        {
+            decimal result;
+            try
+            {
+                result = Convert.ToDecimal(t.FinalValue);
+            }
+            catch (InvalidCastException)
+            {
+                result = 0;
+            }
+            return result;
+        }
+
+        #endregion
 
     }
 }
