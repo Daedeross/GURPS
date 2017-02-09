@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using ExpressionEvaluator;
 using System.Dynamic;
 using System.Linq.Expressions;
+using GurpsBuilder.DataModels.Events;
+using GurpsBuilder.Helpers;
 
 namespace GurpsBuilder.DataModels
 {
@@ -24,24 +26,24 @@ namespace GurpsBuilder.DataModels
         protected Type mValueType = typeof(T);
 
         #endregion // Fields
-
         #region Properties
 
         public T Value
         {
             get
             {
-                T val;
-                try
-                {
-                    val = _exprDelegate(context);
-                    mLastValidValue = val;
-                }
-                catch
-                {
-                    val = mLastValidValue;
-                }
-                return val;
+                return mLastValidValue;
+                //T val;
+                //try
+                //{
+                //    val = _exprDelegate(context);
+                //    mLastValidValue = val;
+                //}
+                //catch
+                //{
+                //    val = mLastValidValue;
+                //}
+                //return val;
             }
         }
 
@@ -89,7 +91,7 @@ namespace GurpsBuilder.DataModels
             }
         }
 
-        public event EventHandler ValueChanged;
+        public event ValueChangedEventHandler ValueChanged;
 
         public string Text
         {
@@ -101,7 +103,25 @@ namespace GurpsBuilder.DataModels
             {
                 if (value != _exprText)
                 {
-                    CompileExpression(value);
+                    if (CompileExpression(value))
+                    {
+                        T val;
+                        try
+                        {
+                            val = _exprDelegate(context);
+                            mLastValidValue = val;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Write(e.Message);
+                            val = mLastValidValue;
+                        }
+
+                        if (!val.Equals(mLastValidValue))
+                        {
+                            OnValueChanged(new ValueChangedEventArgs(mLastValidValue, null));
+                        }
+                    }
                     //System.Diagnostics.Debug.WriteLine("Compile!");
                 }
             }
@@ -125,7 +145,6 @@ namespace GurpsBuilder.DataModels
         }
 
         #endregion //Properties
-
         #region Constructors
 
         public ValueTag()
@@ -157,57 +176,45 @@ namespace GurpsBuilder.DataModels
         }
 
         #endregion // Constructors
-
-        #region Commands
-
-        #endregion // Commands
-
         #region Private Methods
 
-        private void CompileExpression(string expr)
+        private bool CompileExpression(string expr)
         {
-            //try
-            //{
+            var lastText = _exprText;
+            //var lastExpr = _exprCompiled;
+            //var lastDelegate = _exprDelegate;
+            try
+            {
                 _exprText = expr;
                 _exprCompiled = new CompiledExpression<T>(_exprText);
                 _exprDelegate = _exprCompiled.ScopeCompile<Context>();
-
-            //}
-            //catch
-            //{
-            //    _exprCompiled = null;
-            //    _exprDelegate = (c => this.mDefaultValue);
-            //}
+                return true;
+            }
+            catch
+            {
+                _exprText = lastText;
+                _exprCompiled = null;
+                _exprDelegate = (c => this.mDefaultValue);
+                return false;
+            }
         }
 
         private void ResetContext(ITaggable owner)
         {
             context = Context.Generate(owner);
         }
-
-        private bool IsNumeric(Type t)
+        
+        private void OnValueChanged(object sender, ValueChangedEventArgs e)
         {
-            switch (Type.GetTypeCode(t))
-            {
-                case TypeCode.Byte:
-                case TypeCode.SByte:
-                case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                case TypeCode.Int16:
-                case TypeCode.Int32:
-                case TypeCode.Int64:
-                case TypeCode.Decimal:
-                case TypeCode.Double:
-                case TypeCode.Single:
-                    return true;
-                default:
-                    return false;
-            }
+            ValueChanged?.Invoke(sender, e);
+        }
+
+        private void OnValueChanged(ValueChangedEventArgs e)
+        {
+            OnValueChanged(this, e);
         }
 
         #endregion // Private Methods
-
         #region Public Methods
 
         public void Attatch(ITaggable owner)
@@ -220,7 +227,7 @@ namespace GurpsBuilder.DataModels
 
         public override bool TryUnaryOperation(UnaryOperationBinder binder, out object result)
         {
-            if (IsNumeric(myValueType))
+            if (ObjectExtensions.IsNumeric(mValueType))
             {
                 switch (binder.Operation)
                 {
@@ -234,7 +241,7 @@ namespace GurpsBuilder.DataModels
                         result = -(dynamic)(this.FinalValue);
                         return true;
                     case ExpressionType.OnesComplement:
-                        if (myValueType == typeof(int) || myValueType == typeof(uint))
+                        if (mValueType == typeof(int) || mValueType == typeof(uint))
                         {
                             result = ~((int)(object)this.FinalValue);
                             return true;
@@ -246,7 +253,7 @@ namespace GurpsBuilder.DataModels
                         return false;
                 }
             }
-            else if (myValueType == typeof(string))
+            else if (mValueType == typeof(string))
             {
                 switch (binder.Operation)
                 {
@@ -294,7 +301,7 @@ namespace GurpsBuilder.DataModels
             }
             try
             {
-                if (IsNumeric(binder.ReturnType))
+                if (ObjectExtensions.IsNumeric(binder.ReturnType))
                 {
                     switch (binder.Operation)
                     {
@@ -317,14 +324,14 @@ namespace GurpsBuilder.DataModels
                             result = (dynamic)this.FinalValue >= arg;
                             return true;
                         case ExpressionType.LeftShift:
-                            if (myValueType == typeof(int))
+                            if (mValueType == typeof(int))
                             {
                                 result = (dynamic)FinalValue << arg;
                                 return true;
                             }
                             break;
                         case ExpressionType.LeftShiftAssign:
-                            if (myValueType == typeof(int))
+                            if (mValueType == typeof(int))
                             {
                                 result = (dynamic)FinalValue << arg;
                                 return true;
@@ -337,14 +344,14 @@ namespace GurpsBuilder.DataModels
                             result = (dynamic)this.FinalValue <= arg;
                             break;
                         case ExpressionType.Modulo:
-                            if (myValueType == typeof(int))
+                            if (mValueType == typeof(int))
                             {
                                 result = (dynamic)FinalValue % arg;
                                 return true;
                             }
                             break;
                         case ExpressionType.ModuloAssign:
-                            if (myValueType == typeof(int))
+                            if (mValueType == typeof(int))
                             {
                                 result = (dynamic)FinalValue % arg;
                                 return true;
@@ -360,14 +367,14 @@ namespace GurpsBuilder.DataModels
                             result = (dynamic)this.FinalValue != arg;
                             return true;
                         case ExpressionType.RightShift:
-                            if (myValueType == typeof(int))
+                            if (mValueType == typeof(int))
                             {
                                 result = (dynamic)FinalValue >> arg;
                                 return true;
                             }
                             break;
                         case ExpressionType.RightShiftAssign:
-                            if (myValueType == typeof(int))
+                            if (mValueType == typeof(int))
                             {
                                 result = (dynamic)FinalValue >> arg;
                                 return true;
@@ -392,7 +399,7 @@ namespace GurpsBuilder.DataModels
             }
             // see what the arg type is;
             //Type argType = arg.GetType();
-            //bool isString = ( myValueType == typeof(string) );
+            //bool isString = ( mValueType == typeof(string) );
             //if (argType.IsGenericType)
             //{
             //    Type genType = argType.GetGenericTypeDefinition();
@@ -402,7 +409,7 @@ namespace GurpsBuilder.DataModels
             //    }
             //}
             dynamic me = this;
-            if (IsNumeric(binder.ReturnType))
+            if (ObjectExtensions.IsNumeric(binder.ReturnType))
             {
                 float t = me;
                 switch (binder.Operation)
@@ -486,7 +493,6 @@ namespace GurpsBuilder.DataModels
             #endregion // DynamicObject Overloads
 
         #endregion // Public Methods
-
         #region Implicit Conversion Methods
 
         public static implicit operator bool(ValueTag<T> t)
@@ -588,6 +594,5 @@ namespace GurpsBuilder.DataModels
         }
 
         #endregion
-
     }
 }

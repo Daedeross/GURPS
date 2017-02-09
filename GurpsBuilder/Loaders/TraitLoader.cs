@@ -9,6 +9,5 @@ namespace GurpsBuilder.Loaders
     public class TraitLoader
     {
         public string Name { get; set; }
-
     }
 }

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ExpressionEvaluator;
+using ExpressionEvaluator.Extensions;
 using GurpsBuilder.DataModels;
 using System.Linq.Expressions;
 using System.Collections.ObjectModel;
@@ -35,8 +36,10 @@ namespace GurpsBuilder
         {
             InitializeComponent();
             c = new Character();
-            c.Age = 10;
-            c.Height = 3;
+            c.Age = new BaseTrait();
+            c.Age.score = 10;
+            c.Height = new BaseTrait();
+            c.Height.score = 3;
             dynamic st = new BaseTrait();
             st.Attatch(c);
             ValueTag<double> score = new ValueTag<double>(st);
@@ -45,7 +48,7 @@ namespace GurpsBuilder
             
             //st.Tags.Add("score", score);
             st.score = score;
-            st.Test1 = 11;
+            //st.Test1 = 11;
             score.Text = "13";
             dynamic attr = c.Attributes;
             attr.ST = st;
@@ -69,20 +72,33 @@ namespace GurpsBuilder
 
             double result;
 
-            //try
-            //{
+            try
+            {
                 result = del(c);
-            //}
-            //catch
-            //{
-            //    result = -1;
-            //}
+                statusText.Text = "OK";
+            }
+            catch (Exception ex)
+            {
+                statusText.Text = ex.Message;
+                result = -1;
+            }
             propNames = new ObservableCollection<string>(getPropNames(ce.Expression, null));
             propList.ItemsSource = propNames;
             exprResult.Text = result.ToString();
+
+            //var props = getProps(ce.Expression, null);
+            var parameter = getParameter(ce.Expression);
+            var members = getMembers(ce.Expression, null);
+            var dict = ce.GetDependencies(c as Character);
+            foreach (var m in members)
+            {
+                var lamb = Expression.Lambda<Func<Character, object>>(m.ObjectExpression, parameter);
+                var d = lamb.Compile();
+                var x = d(c as Character);
+            }
         }
 
-        private List<string> getPropNames(System.Linq.Expressions.Expression e, List<string> props)
+        private List<string> getPropNames(Expression e, List<string> props)
         {
             if (props == null)
             {
@@ -117,18 +133,190 @@ namespace GurpsBuilder
 
                 if (binder != null)
                 {
+                    //de.Arguments;
                     props.Add(binder.Name);
+                    //var x = binder.call;
+                }
+                //else
+                //{
+                    foreach (Expression expr in de.Arguments)
+                    {
+                        props = getPropNames(expr, props);
+                    }
+                //}
+            }
+            return props;
+        }
+
+        private List<Expression> getProps(Expression e, List<Expression> props)
+        {
+            if (props == null)
+            {
+                props = new List<Expression>();
+            }
+
+
+            if (e is BinaryExpression)
+            {
+                var be = e as BinaryExpression;
+                props = getProps(be.Left, props);
+                props = getProps(be.Right, props);
+
+            }
+            else if (e is UnaryExpression)
+            {
+                var ue = e as UnaryExpression;
+                props = getProps(ue.Operand, props);
+            }
+            else if (e is ConditionalExpression)
+            {
+
+            }
+            else if (e is MemberExpression)
+            {
+                //var me = e as MemberExpression;
+                props.Add(e);
+            }
+            else if (e is DynamicExpression)
+            {
+                var de = e as DynamicExpression;
+
+                System.Dynamic.GetMemberBinder binder = (de.Binder as System.Dynamic.GetMemberBinder);
+
+                if (binder != null)
+                {
+                    //de.Arguments;
+                    props.Add(de);
+                    //var x = binder.call;
                 }
                 else
                 {
                     foreach (Expression expr in de.Arguments)
                     {
-                        props = getPropNames(expr, props);
+                        props = getProps(expr, props);
                     }
                 }
-                //de.Arguments
             }
+
             return props;
+        }
+
+        private ParameterExpression getParameter(Expression e)
+        {
+            if (e is ParameterExpression)
+            {
+                return e as ParameterExpression;
+            }
+            else if (e is BinaryExpression)
+            {
+                var be = e as BinaryExpression;
+                var p = getParameter(be.Left);
+                if (p != null)
+                {
+                    return p;
+                }
+                else return getParameter(be.Right);
+
+            }
+            else if (e is UnaryExpression)
+            {
+                var ue = e as UnaryExpression;
+                return getParameter(ue.Operand);
+            }
+            else if (e is ConditionalExpression)
+            {
+                var ce = e as ConditionalExpression;
+                var p = getParameter(ce.Test);
+                if (p != null)
+                {
+                    return p;
+                }
+                p = getParameter(ce.IfTrue);
+                if (p != null)
+                {
+                    return p;
+                }
+                return getParameter(ce.IfFalse);
+            }
+            else if (e is MemberExpression)
+            {
+                var me = e as MemberExpression;
+                return getParameter(me.Expression);
+            }
+            else if (e is DynamicExpression)
+            {
+                var de = e as DynamicExpression;
+                ParameterExpression p;
+                foreach (Expression expr in de.Arguments)
+                {
+                    p = getParameter(expr);
+                    if (p != null)
+                    {
+                        return p;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private class MemberName
+        {
+            public Expression ObjectExpression { get; set; }
+            public string PropertyName { get; set; }
+        }
+        
+        private List<MemberName> getMembers(Expression e, List<MemberName> mes)
+        {
+            if (mes == null)
+            {
+                mes = new List<MemberName>();
+            }
+
+
+            if (e is BinaryExpression)
+            {
+                var be = e as BinaryExpression;
+                mes = getMembers(be.Left, mes);
+                mes = getMembers(be.Right, mes);
+
+            }
+            else if (e is UnaryExpression)
+            {
+                var ue = e as UnaryExpression;
+                mes = getMembers(ue.Operand, mes);
+            }
+            else if (e is ConditionalExpression)
+            {
+
+            }
+            else if (e is MemberExpression)
+            {
+                var me = e as MemberExpression;
+                mes.Add(new MemberName { ObjectExpression = me.Expression, PropertyName = me.Member.Name });
+            }
+            else if (e is DynamicExpression)
+            {
+                var de = e as DynamicExpression;
+
+                System.Dynamic.GetMemberBinder binder = (de.Binder as System.Dynamic.GetMemberBinder);
+
+                if (binder != null)
+                {
+                    //de.Arguments;
+                    mes.Add(new MemberName { ObjectExpression = de.Arguments[0], PropertyName = binder.Name });
+                    //var x = binder.call;
+                }
+                else
+                {
+                    foreach (Expression expr in de.Arguments)
+                    {
+                        mes = getMembers(expr, mes);
+                    }
+                }
+            }
+
+            return mes;
         }
     }
 }

@@ -42,23 +42,9 @@ namespace GurpsBuilder.DataModels
         #region Private Fields
 
         #endregion // Private fields
-
         #region Properties
-
-        public double Age { get; set; }
-
-        public double Height { get; set; }
-
-        //public Dictionary<string, BaseTrait> Attributes { get; set; }
-        //
-        //public Dictionary<string, BaseTrait> Advantages { get; set; }
-        //
-        //public Dictionary<string, BaseTrait> Disadvantages { get; set; }
-        //
-        //public Dictionary<string, BaseTrait> Skills { get; set; }
-        //
-        //public Dictionary<string, BaseTrait> Items { get; set; }
-
+        
+        public TraitList General { get; set; }
         public TraitList Attributes { get; set; }
         public TraitList Advantages { get; set; }
         public TraitList Disadvantages { get; set; }
@@ -66,17 +52,11 @@ namespace GurpsBuilder.DataModels
         public TraitList Items { get; set; }
         
         #endregion // Properties
-
         #region Constructors
 
         public Character()
         {
-            //Attributes = new Dictionary<string, BaseTrait>();
-            //Advantages = new Dictionary<string, BaseTrait>();
-            //Disadvantages = new Dictionary<string, BaseTrait>();
-            //Skills = new Dictionary<string, BaseTrait>();
-            //Items = new Dictionary<string, BaseTrait>();
-
+            General = new TraitList();
             Attributes = new TraitList();
             Advantages = new TraitList();
             Disadvantages = new TraitList();
@@ -85,14 +65,51 @@ namespace GurpsBuilder.DataModels
         }
 
         #endregion // Constructors
-
         #region Private Methods
 
         #endregion // Private Methods
-
         #region Public Methods
 
-        #endregion // Public Methods
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            switch (binder.Name)
+            {
+                case "Attributes":
+                    result = Attributes;
+                    return true;
+                case "Advantages":
+                    result = Advantages;
+                    return true;
+                case "Disadvantages":
+                    result = Disadvantages;
+                    return true;
+                case "Skills":
+                    result = Skills;
+                    return true;
+                case "Items":
+                    result = Items;
+                    return true;
+                default:
+                    return General.TryGetMember(binder, out result);
+            }
+        }
 
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            switch (binder.Name)
+            {
+                case "Attributes":
+                case "Advantages":
+                case "Disadvantages":
+                case "Skills":
+                case "Items":
+                    return false;
+                default:
+                    return General.TrySetMember(binder, value);
+            }
+            
+        }
+
+        #endregion // Public Methods
     }
 }

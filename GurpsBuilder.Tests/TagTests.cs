@@ -50,5 +50,30 @@ namespace GurpsBuilder.Tests
 
             Assert.AreEqual(13, result.FinalValue);
         }
+
+        [TestMethod]
+        public void TestRefPlusRef()
+        {
+            Character c = new Character();
+            dynamic bt = new BaseTrait(c);
+            dynamic ti = new ValueTag<int>(bt);
+            dynamic tj = new ValueTag<int>(bt);
+            ti.Text = "11";
+            bt.TestInt1 = ti;
+            tj.Text = "2";
+            bt.TestInt2 = tj;
+
+            dynamic result = new ValueTag<int>(bt);
+            result.Text = "owner.TestInt1 + owner.TestInt2";
+            bt.ResultInt = result;
+
+            Assert.AreEqual(13, result.FinalValue);
+        }
+
+        [TestMethod]
+        public void TestDefaultTag()
+        {
+
+        }
     }
 }

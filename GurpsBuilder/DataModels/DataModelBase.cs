@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GurpsBuilder.DataModels
 {
-    public class DataModelBase : INotifyPropertyChanged, IDisposable
+    public class DataModelBase : INotifyPropertyChanged
     {
         protected string mName = "";
         public virtual string Name

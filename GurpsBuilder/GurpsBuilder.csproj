@@ -41,6 +41,10 @@
     <Reference Include="ExpressionEvaluator">
       <HintPath>lib\Expression Evaluator\ExpressionEvaluator.dll</HintPath>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>packages\NLog.4.3.7\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -68,8 +72,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\CharpEvalExtensions.cs" />
     <Compile Include="DataModels\DynamicDataModel.cs" />
+    <Compile Include="DataModels\Events\ValueChangedEvent.cs" />
     <Compile Include="DataModels\FloatTag.cs" />
+    <Compile Include="DataModels\Interfaces\INotifyValueChanged.cs" />
     <Compile Include="DataModels\Interfaces\ITaggable.cs" />
     <Compile Include="DataModels\Traits\BaseTrait.cs" />
     <Compile Include="DataModels\Character.cs" />
@@ -82,6 +89,7 @@
     <Compile Include="DataModels\Interfaces\IValueTag.cs" />
     <Compile Include="DataModels\Traits\Modifier.cs" />
     <Compile Include="DataModels\ValueTag.cs" />
+    <Compile Include="Helpers\ObjectExtensions.cs" />
     <Compile Include="lib\BlankClass.cs" />
     <Compile Include="Loaders\TagLoader.cs" />
     <Compile Include="Loaders\TraitLoader.cs" />
@@ -108,6 +116,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

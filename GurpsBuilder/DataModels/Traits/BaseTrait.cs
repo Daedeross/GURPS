@@ -4,18 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Dynamic;
+using GurpsBuilder.DataModels.Events;
 
 namespace GurpsBuilder.DataModels
 {
-    public class BaseTrait: DynamicDataModel, IModdable, ITaggable
+    public class BaseTrait: DynamicDataModel, IModdable, ITaggable, INotifyValueChanged
     {
         #region Private Fields
 
         #endregion // Private fields
-
         #region Properties
 
-        public int Test1 { get; set; }
+        //public readonly string DefaultTagName;
+
+        //public readonly ITag DefaultTag;
 
         public Character Character { get; private set; }
 
@@ -89,10 +91,10 @@ namespace GurpsBuilder.DataModels
         }
 
             #endregion ITaggable Implementation
-
             #region IModdable Implementation
 
         protected Dictionary<string, Modifier> mMods;
+
         public Dictionary<string, Modifier> Mods
         {
             get { return mMods; }
@@ -119,7 +121,6 @@ namespace GurpsBuilder.DataModels
             #endregion // IModdable Implementation
 
         #endregion // Properties
-
         #region Constructors
 
         public BaseTrait()
@@ -140,15 +141,9 @@ namespace GurpsBuilder.DataModels
         }
 
         #endregion // Constructors
-
-        #region Commands
-
-        #endregion // Commands
-
         #region Private Methods
 
         #endregion // Private Methods
-
         #region Public Methods
 
         public void Attatch(Character character)
@@ -175,14 +170,169 @@ namespace GurpsBuilder.DataModels
             if (tag != null)
             {
                 mTags[name] = tag;
+                if (name == "score" && tag is INotifyValueChanged)
+                {
+                    var vt = tag as INotifyValueChanged;
+                    vt.ValueChanged += this.OnValueChanged;
+                }
+
                 return true;
             }
             return false;
         }
 
-            #endregion // DynamicObject Overloads
-
+        #endregion // DynamicObject Overloads
         #endregion // Public Methods
+        #region IValueChangedImplimentation
+        
+        public event ValueChangedEventHandler ValueChanged;
 
+        private void OnValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            ValueChanged?.Invoke(sender, e);
+        }
+
+        #endregion // IValueChangedImplimentation
+        #region Arithmetric Operators
+
+        public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object result)
+        {
+            return base.TryBinaryOperation(binder, arg, out result);
+        }
+
+        public static implicit operator bool(BaseTrait t)
+        {
+            bool result = false;
+            ITag tag;
+            if (t.TryGetTag("score", out tag))
+            {
+                dynamic vt = tag;
+                try
+                {
+                    result = Convert.ToBoolean(vt.FinalValue);
+                }
+                catch (InvalidCastException)
+                {
+                    result = false;
+                }
+            }
+            return result;
+        }
+
+        public static implicit operator short(BaseTrait t)
+        {
+            short result = 0;
+            ITag tag;
+            if (t.TryGetTag("score", out tag))
+            {
+                dynamic vt = tag;
+                try
+                {
+                    result = Convert.ToInt16(vt.FinalValue);
+                }
+                catch (InvalidCastException)
+                {
+                    result = 0;
+                }
+            }
+            return result;
+        }
+
+        public static implicit operator int(BaseTrait t)
+        {
+            int result = 0;
+            ITag tag;
+            if (t.TryGetTag("score", out tag))
+            {
+                dynamic vt = tag;
+                try
+                {
+                    result = Convert.ToInt32(vt.FinalValue);
+                }
+                catch (InvalidCastException)
+                {
+                    result = 0;
+                }
+            }
+            return result;
+        }
+
+        public static implicit operator long(BaseTrait t)
+        {
+            long result = 0L;
+            ITag tag;
+            if (t.TryGetTag("score", out tag))
+            {
+                dynamic vt = tag;
+                try
+                {
+                    result = Convert.ToInt64(vt.FinalValue);
+                }
+                catch (InvalidCastException)
+                {
+                    result = 0;
+                }
+            }
+            return result;
+        }
+
+        public static implicit operator float(BaseTrait t)
+        {
+            float result = 0f;
+            ITag tag;
+            if (t.TryGetTag("score", out tag))
+            {
+                dynamic vt = tag;
+                try
+                {
+                    result = Convert.ToSingle(vt.FinalValue);
+                }
+                catch (InvalidCastException)
+                {
+                    result = 0;
+                }
+            }
+            return result;
+        }
+
+        public static implicit operator double(BaseTrait t)
+        {
+            double result = 0;
+            ITag tag;
+            if (t.TryGetTag("score", out tag))
+            {
+                dynamic vt = tag;
+                try
+                {
+                    result = Convert.ToDouble(vt.FinalValue);
+                }
+                catch (InvalidCastException)
+                {
+                    result = 0;
+                }
+            }
+            return result;
+        }
+
+        public static implicit operator decimal(BaseTrait t)
+        {
+            decimal result = 0m;
+            ITag tag;
+            if (t.TryGetTag("score", out tag))
+            {
+                dynamic vt = tag;
+                try
+                {
+                    result = Convert.ToDecimal(vt.FinalValue);
+                }
+                catch (InvalidCastException)
+                {
+                    result = 0;
+                }
+            }
+            return result;
+        }
+
+        #endregion // Arithmetric Operators
     }
 }

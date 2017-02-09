@@ -8,8 +8,9 @@
             <RowDefinition Height="auto" />
             <RowDefinition />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <TextBox Name="exprText" Padding="2">Age + Attributes["ST"].Tags["score"].FinalValue</TextBox>
+        <TextBox Name="exprText" Padding="2">Age + Attributes.ST</TextBox>
         <TextBlock Name="exprResult"
                    Grid.Row="1"
                    Padding="2"></TextBlock>
@@ -19,5 +20,8 @@
                  ItemsSource="{Binding propNames}">
         </ListBox>
         <Button Grid.Row="3" HorizontalAlignment="Center" Padding="2" Click="Button_Click"> Test</Button>
+        <StatusBar Grid.Row="4">
+            <TextBlock Name="statusText" />
+        </StatusBar>
     </Grid>
 </Window>

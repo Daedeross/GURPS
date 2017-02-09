@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GurpsBuilder.DataModels
 {
-    public class DynamicDataModel: DynamicObject, INotifyPropertyChanged, IDisposable
+    public class DynamicDataModel: DynamicObject, INotifyPropertyChanged
     {
         protected string mName = "";
         public virtual string Name
@@ -25,21 +25,15 @@ namespace GurpsBuilder.DataModels
 
         protected void OnPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         protected void BubblePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            PropertyChanged(this, e);
+            PropertyChanged?.Invoke(this, e);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public virtual void Dispose()
-        {
-            throw new NotImplementedException();
-        }
 
         #endregion
     }
